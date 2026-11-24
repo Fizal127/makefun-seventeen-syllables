@@ -20,8 +20,12 @@ the bug wore my name"""
 
 def main() -> None:
     os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+    # Write atomically so a partial /output/entry.txt is never left behind
+    # if the process is interrupted mid-write.
+    tmp_path = "/output/.entry.txt.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(HAIKU + "\n")
+    os.replace(tmp_path, "/output/entry.txt")
 
 
 if __name__ == "__main__":
